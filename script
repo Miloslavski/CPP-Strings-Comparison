@@ -1,0 +1,48 @@
+#include <iostream>
+#include <fstream>
+#include <unordered_set>
+#include <string>
+#include <functional>
+#include <vector>
+
+std::size_t stringHash(const std::string& str) {
+    return std::hash<std::string>()(str);
+}
+
+int main() {
+    std::unordered_set<std::size_t> apHashes;
+    std::vector<std::string> uniqueLines;
+    std::string line;
+    
+    std::ifstream apFile("ap.txt");
+    while (getline(apFile, line)) {
+        apHashes.insert(stringHash(line));
+    }
+    apFile.close();
+
+    std::ifstream resFile("res.txt");
+    while (getline(resFile, line)) {
+        std::size_t lineHash = stringHash(line);
+        if (apHashes.find(lineHash) == apHashes.end()) {
+            uniqueLines.push_back(line);
+        }
+    }
+    resFile.close();
+
+    std::ofstream resOutFile("res.txt");
+    for (const auto& uniqueLine : uniqueLines) {
+        resOutFile << uniqueLine << std::endl;
+    }
+    resOutFile.close();
+
+    std::ofstream apOutFile("ap.txt", std::ios_base::app);
+    for (const auto& uniqueLine : uniqueLines) {
+        apOutFile << uniqueLine << std::endl;
+    }
+    apOutFile.close();
+
+    std::cout << "Total strings in the database (ap.txt): " << apHashes.size() << std::endl;
+    std::cout << "Unique strings that are added: " << uniqueLines.size() << std::endl;
+
+    return 0;
+}
